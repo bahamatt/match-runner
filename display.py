@@ -1,13 +1,13 @@
 import pygame
 from random import randrange
 from pygame.locals import *
+import match3 as match
 
 WIDTH = 800
 HEIGHT = 640
 
 
 class PlayerObject:
-
     def __init__(self):
         self.x = 1 / 5 * WIDTH
         self.y = 4 / 5 * HEIGHT - 20
@@ -53,8 +53,8 @@ class PlayerObject:
 
 
 class ScoreObject:
-
     def __init__(self, score, speed):
+        self.x = 0
         self.surface = pygame.Surface((100, 1 / 5 * HEIGHT))
         self.surface.fill(color.THECOLORS["gray"])
         self.score = score
@@ -67,12 +67,14 @@ class ScoreObject:
 
     def update(self, screen, tick, speed):
         self.speed = speed
-        self.rect = self.rect.move(-self.speed / tick, 0)
+        #self.x -= self.speed/tick
+        #self.x += int(self.speed/tick)
+        self.rect = self.rect.move(-self.speed/tick, 0)
+        #self.x -= int(self.x)
         screen.blit(self.surface, self.rect)
 
 
 class RectangleObstacle:
-
     def __init__(self, game_speed):
         self.max_height = HEIGHT / 2 - 100
         self.height = self.max_height - randrange(10) * 15
@@ -90,7 +92,6 @@ class RectangleObstacle:
 
 
 class Tunnel:
-
     def __init__(self, game_speed):
         self.x = WIDTH
         self.tunnel_length = 250
@@ -113,7 +114,6 @@ class Tunnel:
 
 
 class Stone:
-
     def __init__(self, game_speed):
         self.x = WIDTH
         self.y = 0
@@ -149,7 +149,6 @@ class Stone:
 
 
 class GroundStone:
-
     def __init__(self, game_speed):
         self.x = WIDTH + 100
         self.y = 4 / 5 * HEIGHT - 60
@@ -164,8 +163,22 @@ class GroundStone:
         screen.blit(self.surface, self.rect)
 
 
-class ObstaclesInitiralizer:
+class MatchRectangle:
+    def __init__(self, game_speed):
+        self.x = randrange(350, WIDTH)
+        self.y = randrange(4 / 5 * HEIGHT - 80)
+        self.speed = game_speed
+        self.surface = pygame.Surface((35, 35))
+        self.surface.fill(color.THECOLORS["orange"])
+        self.rect = Rect(self.surface.get_rect())
 
+    def update(self, screen, tick, speed):
+        self.speed = speed
+        self.rect = self.rect = self.rect.move(-self.speed / tick, 0)
+        screen.blit(self.surface, self.rect)
+
+
+class ObstaclesInitializer:
     @staticmethod
     def rectangle_obstacles_init(rectangle_obstacles, speed):
         for i in range(0, 6):
@@ -181,11 +194,15 @@ class ObstaclesInitiralizer:
 
 
 class Game:
-
     def __init__(self):
         pygame.init()
-        self.obstacles_initializer = ObstaclesInitiralizer()
+        pygame.display.set_caption("Match Runner")
+        #self.obstacles_initializer = ObstaclesInitializer()
+        self._start_window = True
         self._running = True
+        self._paused = False
+        self._gameover = False
+        self.display_match = False
         self.speed = 50
         self.maxspeed = 150
         self.final_score = 0
@@ -199,8 +216,29 @@ class Game:
         self.stones = []
         self.ground_stones = []
         self.tunnels = []
+        self.match_rectangles = []
         self.deltaspeed = 0.01
         self.is_displaying_obstacles = False
+        self.tick = 0
+
+    def new_game_init(self):
+        self._running = True
+        self._paused = False
+        self._gameover = False
+        self.display_match = False
+        self.speed = 50
+        self.final_score = 0
+        self.player = PlayerObject()
+        self.player.rect = self.player.rect.move(self.player.x, self.player.y)
+        self.scores = []
+        self.scores_init()
+        self.rectangle_obstacles = []
+        self.stones = []
+        self.ground_stones = []
+        self.tunnels = []
+        self.match_rectangles = []
+        self.is_displaying_obstacles = False
+        self.tick = 0
 
     def scores_init(self):
         for i in range(0, 9):
@@ -217,20 +255,23 @@ class Game:
 
     def obstacles_display(self):
         if not self.is_displaying_obstacles:
-            rand = randrange(4)
+            rand = randrange(5)
             if rand == 0:
-                self.obstacles_initializer.rectangle_obstacles_init(self.rectangle_obstacles, self.speed)
+                #self.obstacles_initializer.rectangle_obstacles_init(self.rectangle_obstacles, self.speed)
+                self.rectangle_obstacles_init()
             elif rand == 1:
                 self.stones_init()
             elif rand == 2:
                 self.ground_stone_init()
             elif rand == 3:
                 self.tunnels_init()
-            self.is_displaying_obstacles = True
+            elif rand == 4:
+                if randrange(2) == 0:
+                    self.match_rectangle_init()
 
     def check_for_collision(self, obstacle_rect):
         if obstacle_rect.colliderect(self.player.rect):
-            self._running = False
+            self._gameover = True
 
     def obstacles_handler(self, tick):
         if self.rectangle_obstacles:
@@ -254,6 +295,16 @@ class Game:
                 self.check_for_collision(tunnel.upper_rect)
                 self.check_for_collision(tunnel.lower_rect)
             self.tunnels_update()
+        if self.match_rectangles:
+            if self._paused:
+                self._paused = False
+            for rect in self.match_rectangles:
+                rect.update(self.screen, tick, self.speed)
+                if not self.display_match and rect.rect.colliderect(self.player.rect):
+                    self._paused = True
+                    self.display_match = True
+                    self.match_init()
+            self.match_rectangle_update()
 
     def events_handler(self):
         for event in pygame.event.get():
@@ -277,6 +328,7 @@ class Game:
                 new_obstacle = RectangleObstacle(self.speed)
                 new_obstacle.rect = new_obstacle.rect.move(new_obstacle.x + i * 300, 0)
                 self.rectangle_obstacles.append(new_obstacle)
+        self.is_displaying_obstacles = True
 
     def rectangle_obstacles_update(self):
         if len(self.rectangle_obstacles) == 1:
@@ -291,6 +343,7 @@ class Game:
             new_tunnel.lower_rect = new_tunnel.lower_rect.move(new_tunnel.x + i * 375,
                                                                4 / 5 * HEIGHT - new_tunnel.lower_length)
             self.tunnels.append(new_tunnel)
+        self.is_displaying_obstacles = True
 
     def tunnels_update(self):
         if len(self.tunnels) == 1:
@@ -303,6 +356,7 @@ class Game:
             new_stone = Stone(self.speed)
             new_stone.rect = new_stone.rect.move(new_stone.x + i * 250, new_stone.y)
             self.stones.append(new_stone)
+        self.is_displaying_obstacles = True
 
     def stones_update(self):
         if len(self.stones) == 1:
@@ -314,35 +368,115 @@ class Game:
         new_circle = GroundStone(self.speed)
         new_circle.rect = new_circle.rect.move(new_circle.x, new_circle.y)
         self.ground_stones.append(new_circle)
+        self.is_displaying_obstacles = True
 
     def ground_stone_update(self):
         if self.ground_stones[0].rect.x <= -50:
             self.ground_stones.remove(self.ground_stones[0])
             self.is_displaying_obstacles = False
 
+    def match_rectangle_init(self):
+        new_match_rect = MatchRectangle(self.speed)
+        new_match_rect.rect = new_match_rect.rect.move(new_match_rect.x, new_match_rect.y)
+        self.match_rectangles.append(new_match_rect)
+        self.is_displaying_obstacles = True
+
+    def match_init(self):
+        match.main()
+
+    def match_rectangle_update(self):
+        if self.match_rectangles[0].rect.x <= 80:
+            self.match_rectangles.remove(self.match_rectangles[0])
+            self.display_match = False
+            self.is_displaying_obstacles = False
+
+    def start_menu(self):
+        self.screen.fill(color.THECOLORS["black"])
+        font = pygame.font.SysFont('centurygothic', 80)
+        (w, h) = pygame.font.Font.size(font, "Match Runner")
+        title_surface = font.render("Match Runner", True, color.THECOLORS["blue"])
+        self.screen.blit(title_surface, ((WIDTH - w) / 2, h / 3))
+        menu_surface = pygame.Surface((400, 410))
+        menu_surface.fill(color.THECOLORS["gray"])
+        self.screen.blit(menu_surface, (200, 170))
+        menu_black_surf = pygame.Surface((360, 110))
+        menu_black_surf.fill(color.THECOLORS["black"])
+        font = pygame.font.SysFont('centurygothic', 50)
+        start_surface = font.render("Start", True, color.THECOLORS["white"], color.THECOLORS["black"])
+        (w, h) = pygame.font.Font.size(font, "Start")
+        self.screen.blit(menu_black_surf, (220, 190))
+        self.screen.blit(start_surface, ((WIDTH - w)/2, 210))
+        help_surface = font.render("Help", True, color.THECOLORS["white"], color.THECOLORS["black"])
+        (w, h) = pygame.font.Font.size(font, "Help")
+        self.screen.blit(menu_black_surf, (220, 320))
+        self.screen.blit(help_surface, ((WIDTH-w)/2, 340))
+        quit_surface = font.render("Quit", True, color.THECOLORS["white"], color.THECOLORS["black"])
+        (w, h) = pygame.font.Font.size(font, "Quit")
+        self.screen.blit(menu_black_surf, (220, 450))
+        self.screen.blit(quit_surface, ((WIDTH-w)/2, 470))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == MOUSEBUTTONDOWN:
+                mouse_rect = pygame.Rect(pygame.mouse.get_pos(), (3, 3))
+                if Rect(220, 190, 360, 110).colliderect(mouse_rect):
+                    self.new_game_init()
+                    self._start_window = False
+                elif Rect(220, 450, 360, 110).colliderect(mouse_rect):
+                    pygame.quit()
+                    quit()
+
+    def gameover(self):
+        self.screen.fill(color.THECOLORS["black"])
+        font = pygame.font.SysFont('centurygothic', 60)
+        (w, h) = pygame.font.Font.size(font, "Game Over")
+        title_surface = font.render("Game Over", True, color.THECOLORS["blue"])
+        self.screen.blit(title_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 3))
+        (w, h) = pygame.font.Font.size(font, "Score: " + str(self.final_score))
+        score_surface = font.render("Score: " + str(self.final_score), True, color.THECOLORS["blue"])
+        self.screen.blit(score_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 2))
+        font = pygame.font.SysFont('centurygothic', 30)
+        (w, h) = pygame.font.Font.size(font, "  Back to menu  ")
+        back_to_menu_surface = font.render("  Back to menu  ", True, color.THECOLORS["white"], color.THECOLORS["black"])
+        back_to_menu_bg = pygame.Surface((w+4, h+4))
+        back_to_menu_bg.fill(color.THECOLORS["gray"])
+        self.screen.blit(back_to_menu_bg, (28, HEIGHT-h-22))
+        self.screen.blit(back_to_menu_surface, (30, HEIGHT - h - 20))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == MOUSEBUTTONDOWN:
+                mouse_rect = pygame.Rect(pygame.mouse.get_pos(), (3, 3))
+                if Rect(30, HEIGHT - h - 20, w+4, h+4).colliderect(mouse_rect):
+                    self._gameover = False
+                    self._start_window = True
+
     def execute(self):
         while self._running:
+            while self._start_window:
+                self.start_menu()
+            while self._gameover:
+                self.gameover()
             if self.speed < self.maxspeed:
                 self.speed += self.deltaspeed
-            tick = self.clock.tick(60)
-
+            self.tick = self.clock.tick(60)
             self.events_handler()
-
             self.screen.fill(color.THECOLORS["black"])
-
             for score in self.scores:
-                score.update(self.screen, tick, self.speed)
-
-            self.player.update(self.screen, tick/1000.0, self.speed)
-
+                score.update(self.screen, self.tick, self.speed)
+            if not self._paused:
+                self.player.update(self.screen, self.tick/1000.0, self.speed)
             self.obstacles_display()
-            self.obstacles_handler(tick)
-
+            self.obstacles_handler(self.tick)
             self.scores_update()
             pygame.display.flip()
-        for score in self.scores:
-            if score.rect.left < self.player.rect.left:
-                self.final_score = score.score
+            for score in self.scores:
+                if score.rect.left < self.player.rect.left:
+                    self.final_score = score.score
         print(self.final_score)
 
 
@@ -353,3 +487,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# int na float dla plynnej zmiany predkosci
