@@ -2,6 +2,7 @@ import random
 
 import pygame
 from pygame.locals import *
+import time
 
 WIDTH = 800
 HEIGHT = 640
@@ -58,6 +59,12 @@ class Game:
                 self.screen.blit(self.board[i][j].image, (150 + 64 * i + self.board[i][j].offset[0],
                                                           100 + 64 * j + self.board[i][j].offset[1]))
 
+    def win_window(self):
+        font = pygame.font.SysFont('centurygothic', 80)
+        win_surface = font.render("Extra speed!", True, color.THECOLORS["white"], color.THECOLORS["black"])
+        (w, h) = pygame.font.Font.size(font, "Extra speed!")
+        self.screen.blit(win_surface, ((15+WIDTH-w)/2, (HEIGHT-h)/2))
+
     def execute(self):
         while self._running:
             tick = self.clock.tick(60)
@@ -81,11 +88,26 @@ class Game:
             self.screen.fill(color.THECOLORS["black"])
             self.draw()
             pygame.display.flip()
-            # self.time_left -= tick
-            # TODO: uncomment above line to set a time limit
+            self.time_left -= tick
+            if self.score >= 500:
+                pygame.display.update()
+                self.win_window()
+                self.wait_for(1000)
+                self._running = False
+                return self.score
             if self.time_left < 0:
                 self._running = False
                 return self.score
+
+    def wait_for(self, wait_time):
+        screen_copy = self.screen.copy()
+        wait_count = 0
+        while wait_count < wait_time:
+            dt = self.clock.tick(60)
+            wait_count += dt
+            pygame.event.pump()
+            self.screen.blit(screen_copy, (0, 0))
+            pygame.display.flip()
 
     def events_handler(self):
         for event in pygame.event.get():
