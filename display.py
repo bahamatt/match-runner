@@ -278,7 +278,7 @@ class Game:
                 self.ground_stone_init()
             elif rand == 3:
                 self.tunnels_init()
-            elif rand == 5 and not self.start_bonus_speed and self.bonus_speed_time == 0:
+            elif rand == 4 and not self.start_bonus_speed and self.bonus_speed_time == 0:
                 if randrange(3) != 0:
                     self.match_rectangle_init()
 
@@ -465,10 +465,10 @@ class Game:
                 quit()
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_rect = pygame.Rect(pygame.mouse.get_pos(), (3, 3))
-                if Rect(220, 190, 360, 110).colliderect(mouse_rect):
+                if Rect(220, 190, 360, 82.5).colliderect(mouse_rect):
                     self.new_game_init()
                     self._start_window = False
-                elif Rect(220, 450, 360, 110).colliderect(mouse_rect):
+                elif Rect(220, 497.5, 360, 82.5).colliderect(mouse_rect):
                     pygame.quit()
                     quit()
 
