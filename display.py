@@ -206,7 +206,7 @@ class Game:
         self._paused = False
         self._gameover = False
         self.display_match = False
-        self.bonus_speed = False
+        self.start_bonus_speed = False
         self.no_collision = False
         self.bonus_speed_time = 0
         self.no_collision_time = 0
@@ -234,7 +234,7 @@ class Game:
         self._paused = False
         self._gameover = False
         self.display_match = False
-        self.bonus_speed = False
+        self.start_bonus_speed = False
         self.no_collision = False
         self.bonus_speed_time = 0
         self.no_collision_time = 0
@@ -278,7 +278,7 @@ class Game:
                 self.ground_stone_init()
             elif rand == 3:
                 self.tunnels_init()
-            elif rand == 4 and not self.bonus_speed and self.bonus_speed_time == 0:
+            elif rand == 5 and not self.start_bonus_speed and self.bonus_speed_time == 0:
                 if randrange(3) != 0:
                     self.match_rectangle_init()
 
@@ -408,11 +408,11 @@ class Game:
             self.is_displaying_obstacles = False
 
     def bonus_speed_handler(self):
-        if self.bonus_speed and self.player.on_the_ground():
+        if self.start_bonus_speed and self.player.on_the_ground():
             self.no_collision_time = 5500
             self.bonus_speed_time = 4000
             self.speed = self.speed * 3
-            self.bonus_speed = False
+            self.start_bonus_speed = False
         if self.bonus_speed_time > 0:
             self.bonus_speed_time -= self.tick
         if self.no_collision_time > 0:
@@ -424,9 +424,11 @@ class Game:
             self.no_collision_time = 0
             self.no_collision = False
         if self.bonus_score >= 500:
-            self.bonus_speed = True
+            self.start_bonus_speed = True
             self.no_collision = True
             self.bonus_score = 0
+        if self.speed > self.maxspeed and self.bonus_speed_time == 0:
+            self.speed = self.speed / 3
 
     def start_menu(self):
         self.screen.fill(color.THECOLORS["black"])
@@ -515,10 +517,10 @@ class Game:
             self.match_updater(self.tick)
             self.obstacles_display()
             self.scores_update()
-            if self.no_collision:
+            if self.bonus_speed_time > 0:
                 font = pygame.font.SysFont('centurygothic', 120)
-                (w, h) = pygame.font.Font.size(font, "BONUS")
-                title_surface = font.render("BONUS", True, color.THECOLORS["orange"])
+                (w, h) = pygame.font.Font.size(font, "BONUS!")
+                title_surface = font.render("BONUS!", True, color.THECOLORS["orange"])
                 self.screen.blit(title_surface, ((WIDTH - w) / 2, h / 3))
             pygame.display.flip()
             for score in self.scores:
