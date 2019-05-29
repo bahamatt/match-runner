@@ -91,8 +91,8 @@ class Game:
             self.time_left -= tick
             if self.score >= 500:
                 pygame.display.update()
-                self.win_window()
-                self.wait_for(1000)
+                # self.win_window()
+                self.wait_for(250)
                 self._running = False
                 return self.score
             if self.time_left < 0:

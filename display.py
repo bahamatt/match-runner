@@ -36,7 +36,7 @@ class PlayerObject:
             self.jumping = True
             self.falling = False
 
-    def update(self, screen, tick, deltaspeed):
+    def update(self, screen, tick, deltaspeed, no_collision):
         if self.on_jump_max_height():
             self.dy += 50 + deltaspeed
             self.jumping = False
@@ -49,7 +49,10 @@ class PlayerObject:
             self.falling = False
 
         self.y += self.dy * tick
-        self.rect = pygame.draw.rect(screen, color.THECOLORS["red"], [self.x, self.y, 20, 20], 0)
+        if no_collision:
+            self.rect = pygame.draw.rect(screen, color.THECOLORS["orange"], [self.x, self.y, 20, 20], 0)
+        else:
+            self.rect = pygame.draw.rect(screen, color.THECOLORS["red"], [self.x, self.y, 20, 20], 0)
 
 
 class ScoreObject:
@@ -508,10 +511,15 @@ class Game:
                 score.update(self.screen, self.tick, self.speed)
             self.obstacles_handler(self.tick)
             if not self._paused:
-                self.player.update(self.screen, self.tick/1000.0, self.speed)
+                self.player.update(self.screen, self.tick/1000.0, self.speed, self.no_collision)
             self.match_updater(self.tick)
             self.obstacles_display()
             self.scores_update()
+            if self.no_collision:
+                font = pygame.font.SysFont('centurygothic', 120)
+                (w, h) = pygame.font.Font.size(font, "BONUS")
+                title_surface = font.render("BONUS", True, color.THECOLORS["orange"])
+                self.screen.blit(title_surface, ((WIDTH - w) / 2, h / 3))
             pygame.display.flip()
             for score in self.scores:
                 if score.rect.left < self.player.rect.left:
@@ -527,6 +535,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-# int na float dla plynnej zmiany predkosci
