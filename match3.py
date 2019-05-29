@@ -45,7 +45,6 @@ class Game:
         self._selected = (-1, -1)
         self.shape_names = ["red", "blue", "green", "purple", "yellow", "orange", "white"]
         self.shapes = [pygame.image.load("img/{}.bmp".format(shape)) for shape in self.shape_names]
-        self.blank = pygame.image.load("img/blank.bmp")
         self.board = self.generate()
 
     def draw(self):

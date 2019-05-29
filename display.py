@@ -1,3 +1,5 @@
+import os
+import pickle
 import pygame
 from random import randrange
 from pygame.locals import *
@@ -70,10 +72,7 @@ class ScoreObject:
 
     def update(self, screen, tick, speed):
         self.speed = speed
-        #self.x -= self.speed/tick
-        #self.x += int(self.speed/tick)
         self.rect = self.rect.move(-self.speed/tick, 0)
-        #self.x -= int(self.x)
         screen.blit(self.surface, self.rect)
 
 
@@ -196,12 +195,26 @@ class ObstaclesInitializer:
                 rectangle_obstacles.append(new_obstacle)
 
 
+def default_scores():
+    score_list = [(16000, "Alice"), (8000, "Bob"), (4000, "Craig"), (2000, "Dave"), (1000, "Erin"), (500, "Frank"),
+                  (400, "Grace"), (300, "Heidi"), (200, "Ivan"), (100, "Judy")]
+    return score_list
+
+
 class Game:
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("Match Runner")
-        #self.obstacles_initializer = ObstaclesInitializer()
+        self._high_scores = []
+        if os.path.isfile('scores.pickle'):
+            with open('scores.pickle', 'rb') as file:
+                self._high_scores = pickle.load(file)
+        else:
+            with open('scores.pickle', 'wb') as file:
+                pickle.dump(default_scores(), file)
+                self._high_scores = default_scores()
         self._start_window = True
+        self._scores_window = False
         self._running = True
         self._paused = False
         self._gameover = False
@@ -270,7 +283,6 @@ class Game:
         if not self.is_displaying_obstacles:
             rand = randrange(5)
             if rand == 0:
-                #self.obstacles_initializer.rectangle_obstacles_init(self.rectangle_obstacles, self.speed)
                 self.rectangle_obstacles_init()
             elif rand == 1:
                 self.stones_init()
@@ -278,7 +290,7 @@ class Game:
                 self.ground_stone_init()
             elif rand == 3:
                 self.tunnels_init()
-            elif rand == 5 and not self.start_bonus_speed and self.bonus_speed_time == 0:
+            elif rand == 4 and not self.start_bonus_speed and self.bonus_speed_time == 0:
                 if randrange(3) != 0:
                     self.match_rectangle_init()
 
@@ -468,25 +480,28 @@ class Game:
                 if Rect(220, 190, 360, 110).colliderect(mouse_rect):
                     self.new_game_init()
                     self._start_window = False
+                elif Rect(220, 292.5, 360, 110).colliderect(mouse_rect):
+                    self._start_window = False
+                    self._scores_window = True
                 elif Rect(220, 450, 360, 110).colliderect(mouse_rect):
                     pygame.quit()
                     quit()
 
-    def gameover(self):
+    def score_screen(self):
         self.screen.fill(color.THECOLORS["black"])
-        font = pygame.font.SysFont('centurygothic', 60)
-        (w, h) = pygame.font.Font.size(font, "Game Over")
-        title_surface = font.render("Game Over", True, color.THECOLORS["blue"])
-        self.screen.blit(title_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 3))
-        (w, h) = pygame.font.Font.size(font, "Score: " + str(self.final_score))
-        score_surface = font.render("Score: " + str(self.final_score), True, color.THECOLORS["blue"])
-        self.screen.blit(score_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 2))
-        font = pygame.font.SysFont('centurygothic', 30)
+        font = pygame.font.SysFont('centurygothic', 32)
+        for i in range(10):
+            surface = font.render("{:d}".format(i + 1), True, color.THECOLORS["blue"])
+            self.screen.blit(surface, ((WIDTH / 16), (HEIGHT / 12) * i + 16))
+            surface = font.render("{:d}".format(self._high_scores[i][0]), True, color.THECOLORS["blue"])
+            self.screen.blit(surface, ((WIDTH / 4), (HEIGHT / 12) * i + 16))
+            surface = font.render(self._high_scores[i][1], True, color.THECOLORS["blue"])
+            self.screen.blit(surface, ((WIDTH / 2), (HEIGHT / 12) * i + 16))
         (w, h) = pygame.font.Font.size(font, "  Back to menu  ")
         back_to_menu_surface = font.render("  Back to menu  ", True, color.THECOLORS["white"], color.THECOLORS["black"])
-        back_to_menu_bg = pygame.Surface((w+4, h+4))
+        back_to_menu_bg = pygame.Surface((w + 4, h + 4))
         back_to_menu_bg.fill(color.THECOLORS["gray"])
-        self.screen.blit(back_to_menu_bg, (28, HEIGHT-h-22))
+        self.screen.blit(back_to_menu_bg, (28, HEIGHT - h - 22))
         self.screen.blit(back_to_menu_surface, (30, HEIGHT - h - 20))
         pygame.display.update()
         for event in pygame.event.get():
@@ -496,13 +511,57 @@ class Game:
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_rect = pygame.Rect(pygame.mouse.get_pos(), (3, 3))
                 if Rect(30, HEIGHT - h - 20, w+4, h+4).colliderect(mouse_rect):
-                    self._gameover = False
+                    self._scores_window = False
                     self._start_window = True
+
+    def gameover(self):
+        name = ""
+        new_high_score = self.final_score > self._high_scores[9][0]
+        while self._gameover:
+            self.screen.fill(color.THECOLORS["black"])
+            font = pygame.font.SysFont('centurygothic', 60)
+            (w, h) = pygame.font.Font.size(font, "Game Over")
+            title_surface = font.render("Game Over", True, color.THECOLORS["blue"])
+            self.screen.blit(title_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 3))
+            (w, h) = pygame.font.Font.size(font, "Score: " + str(self.final_score))
+            score_surface = font.render("Score: " + str(self.final_score), True, color.THECOLORS["blue"])
+            self.screen.blit(score_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 2))
+            if new_high_score:
+                (w, h) = pygame.font.Font.size(font, "Enter your name: {:s}".format(name))
+                score_surface = font.render("Enter your name: {:s}".format(name), True, color.THECOLORS["blue"])
+                self.screen.blit(score_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 2 + 2 * h))
+            font = pygame.font.SysFont('centurygothic', 30)
+            (w, h) = pygame.font.Font.size(font, "  Back to menu  ")
+            back_to_menu_surface = font.render("  Back to menu  ", True, color.THECOLORS["white"], color.THECOLORS["black"])
+            back_to_menu_bg = pygame.Surface((w+4, h+4))
+            back_to_menu_bg.fill(color.THECOLORS["gray"])
+            self.screen.blit(back_to_menu_bg, (28, HEIGHT-h-22))
+            self.screen.blit(back_to_menu_surface, (30, HEIGHT - h - 20))
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                elif event.type == MOUSEBUTTONDOWN:
+                    mouse_rect = pygame.Rect(pygame.mouse.get_pos(), (3, 3))
+                    if Rect(30, HEIGHT - h - 20, w+4, h+4).colliderect(mouse_rect):
+                        self._gameover = False
+                        self._start_window = True
+                elif event.type == KEYDOWN and new_high_score:
+                    if event.key == K_RETURN:
+                        self.add_high_score(self.final_score, name)
+                        new_high_score = False
+                    elif event.key == K_BACKSPACE:
+                        name = name[:-1]
+                    else:
+                        name += event.unicode
 
     def execute(self):
         while self._running:
             while self._start_window:
                 self.start_menu()
+            while self._scores_window:
+                self.score_screen()
             if self.speed < self.maxspeed:
                 self.speed += self.deltaspeed
             self.bonus_speed_handler()
@@ -528,6 +587,18 @@ class Game:
                     self.final_score = score.score
             while self._gameover:
                 self.gameover()
+
+    def add_high_score(self, final_score, name):
+        i = 0
+        while self._high_scores[i][0] >= final_score:
+            i += 1
+            if i > 10:
+                print("error")
+                break
+        self._high_scores.insert(i, (final_score, name))
+        self._high_scores.pop()
+        with open('scores.pickle', 'wb') as file:
+            pickle.dump(self._high_scores, file)
 
 
 def main():
