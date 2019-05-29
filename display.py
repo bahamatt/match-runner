@@ -205,6 +205,7 @@ class Game:
         self.display_match = False
         self.speed = 50
         self.maxspeed = 150
+        self.bonus_score = 0
         self.final_score = 0
         self.player = PlayerObject()
         self.player.rect = self.player.rect.move(self.player.x, self.player.y)
@@ -227,6 +228,7 @@ class Game:
         self._gameover = False
         self.display_match = False
         self.speed = 50
+        self.bonus_score = 0
         self.final_score = 0
         self.player = PlayerObject()
         self.player.rect = self.player.rect.move(self.player.x, self.player.y)
@@ -382,7 +384,8 @@ class Game:
         self.is_displaying_obstacles = True
 
     def match_init(self):
-        match.main()
+        bonus_score = match.main()
+        self.bonus_score += bonus_score
 
     def match_rectangle_update(self):
         if self.match_rectangles[0].rect.x <= 80:
@@ -429,6 +432,7 @@ class Game:
                     quit()
 
     def gameover(self):
+        # TODO: Display bonus points from match-3 (self.bonus_score has that value)
         self.screen.fill(color.THECOLORS["black"])
         font = pygame.font.SysFont('centurygothic', 60)
         (w, h) = pygame.font.Font.size(font, "Game Over")
