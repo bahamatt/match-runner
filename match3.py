@@ -2,7 +2,6 @@ import random
 
 import pygame
 from pygame.locals import *
-import time
 
 WIDTH = 800
 HEIGHT = 640
@@ -51,7 +50,7 @@ class Game:
         font = pygame.font.SysFont('centurygothic', 40)
         time_surface = font.render("Time left: {:.3f}".format(self.time_left / 1000), True, color.THECOLORS["white"])
         self.screen.blit(time_surface, (10, 10))
-        score_surface = font.render("Score: {:d}". format(self.score), True, color.THECOLORS["white"])
+        score_surface = font.render("Score: {:d}".format(self.score), True, color.THECOLORS["white"])
         self.screen.blit(score_surface, (10, 50))
         for i in range(8):
             for j in range(8):
@@ -62,7 +61,7 @@ class Game:
         font = pygame.font.SysFont('centurygothic', 80)
         win_surface = font.render("Extra speed!", True, color.THECOLORS["white"], color.THECOLORS["black"])
         (w, h) = pygame.font.Font.size(font, "Extra speed!")
-        self.screen.blit(win_surface, ((15+WIDTH-w)/2, (HEIGHT-h)/2))
+        self.screen.blit(win_surface, ((15 + WIDTH - w) / 2, (HEIGHT - h) / 2))
 
     def execute(self):
         while self._running:

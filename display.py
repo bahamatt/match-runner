@@ -1,8 +1,10 @@
 import os
 import pickle
-import pygame
 from random import randrange
+
+import pygame
 from pygame.locals import *
+
 import match3 as match
 
 WIDTH = 800
@@ -72,7 +74,7 @@ class ScoreObject:
 
     def update(self, screen, tick, speed):
         self.speed = speed
-        self.rect = self.rect.move(-self.speed/tick, 0)
+        self.rect = self.rect.move(-self.speed / tick, 0)
         screen.blit(self.surface, self.rect)
 
 
@@ -457,7 +459,7 @@ class Game:
         start_surface = font.render("New Game", True, color.THECOLORS["white"], color.THECOLORS["black"])
         (w, h) = pygame.font.Font.size(font, "New Game")
         self.screen.blit(menu_black_surf, (220, 190))
-        self.screen.blit(start_surface, ((WIDTH - w)/2, 200))
+        self.screen.blit(start_surface, ((WIDTH - w) / 2, 200))
         scores_surface = font.render("High Scores", True, color.THECOLORS["white"], color.THECOLORS["black"])
         (w, h) = pygame.font.Font.size(font, "High Scores")
         self.screen.blit(menu_black_surf, (220, 292.5))
@@ -465,11 +467,11 @@ class Game:
         help_surface = font.render("Help", True, color.THECOLORS["white"], color.THECOLORS["black"])
         (w, h) = pygame.font.Font.size(font, "Help")
         self.screen.blit(menu_black_surf, (220, 395))
-        self.screen.blit(help_surface, ((WIDTH-w)/2, 405))
+        self.screen.blit(help_surface, ((WIDTH - w) / 2, 405))
         quit_surface = font.render("Quit", True, color.THECOLORS["white"], color.THECOLORS["black"])
         (w, h) = pygame.font.Font.size(font, "Quit")
         self.screen.blit(menu_black_surf, (220, 497.5))
-        self.screen.blit(quit_surface, ((WIDTH-w)/2, 507.5))
+        self.screen.blit(quit_surface, ((WIDTH - w) / 2, 507.5))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -510,7 +512,7 @@ class Game:
                 quit()
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_rect = pygame.Rect(pygame.mouse.get_pos(), (3, 3))
-                if Rect(30, HEIGHT - h - 20, w+4, h+4).colliderect(mouse_rect):
+                if Rect(30, HEIGHT - h - 20, w + 4, h + 4).colliderect(mouse_rect):
                     self._scores_window = False
                     self._start_window = True
 
@@ -532,10 +534,11 @@ class Game:
                 self.screen.blit(score_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 2 + 2 * h))
             font = pygame.font.SysFont('centurygothic', 30)
             (w, h) = pygame.font.Font.size(font, "  Back to menu  ")
-            back_to_menu_surface = font.render("  Back to menu  ", True, color.THECOLORS["white"], color.THECOLORS["black"])
-            back_to_menu_bg = pygame.Surface((w+4, h+4))
+            back_to_menu_surface = font.render("  Back to menu  ", True, color.THECOLORS["white"],
+                                               color.THECOLORS["black"])
+            back_to_menu_bg = pygame.Surface((w + 4, h + 4))
             back_to_menu_bg.fill(color.THECOLORS["gray"])
-            self.screen.blit(back_to_menu_bg, (28, HEIGHT-h-22))
+            self.screen.blit(back_to_menu_bg, (28, HEIGHT - h - 22))
             self.screen.blit(back_to_menu_surface, (30, HEIGHT - h - 20))
             pygame.display.update()
             for event in pygame.event.get():
@@ -544,7 +547,7 @@ class Game:
                     quit()
                 elif event.type == MOUSEBUTTONDOWN:
                     mouse_rect = pygame.Rect(pygame.mouse.get_pos(), (3, 3))
-                    if Rect(30, HEIGHT - h - 20, w+4, h+4).colliderect(mouse_rect):
+                    if Rect(30, HEIGHT - h - 20, w + 4, h + 4).colliderect(mouse_rect):
                         self._gameover = False
                         self._start_window = True
                 elif event.type == KEYDOWN and new_high_score:
@@ -572,7 +575,7 @@ class Game:
                 score.update(self.screen, self.tick, self.speed)
             self.obstacles_handler(self.tick)
             if not self._paused:
-                self.player.update(self.screen, self.tick/1000.0, self.speed, self.no_collision)
+                self.player.update(self.screen, self.tick / 1000.0, self.speed, self.no_collision)
             self.match_updater(self.tick)
             self.obstacles_display()
             self.scores_update()
