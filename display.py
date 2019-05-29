@@ -477,13 +477,13 @@ class Game:
                 quit()
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_rect = pygame.Rect(pygame.mouse.get_pos(), (3, 3))
-                if Rect(220, 190, 360, 110).colliderect(mouse_rect):
+                if Rect(220, 190, 360, 82.5).colliderect(mouse_rect):
                     self.new_game_init()
                     self._start_window = False
-                elif Rect(220, 292.5, 360, 110).colliderect(mouse_rect):
+                elif Rect(220, 292.5, 360, 82.5).colliderect(mouse_rect):
                     self._start_window = False
                     self._scores_window = True
-                elif Rect(220, 450, 360, 110).colliderect(mouse_rect):
+                elif Rect(220, 497.5, 360, 82.5).colliderect(mouse_rect):
                     pygame.quit()
                     quit()
 
