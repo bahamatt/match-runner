@@ -341,6 +341,8 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._running = False
+                pygame.quit()
+                quit()
             if event.type == KEYDOWN and event.key == K_SPACE:
                 if self.player.jumping:
                     self.player.max_jump_height = self.player.y - 150
@@ -448,7 +450,7 @@ class Game:
     def start_menu(self):
         self._running = False
         self.screen.fill(color.THECOLORS["black"])
-        font = pygame.font.SysFont('centurygothic', 80)
+        font = pygame.font.Font('dat/Century Gothic.ttf', 80)
         (w, h) = pygame.font.Font.size(font, "Match Runner")
         title_surface = font.render("Match Runner", True, color.THECOLORS["blue"])
         self.screen.blit(title_surface, ((WIDTH - w) / 2, h / 3))
@@ -457,7 +459,7 @@ class Game:
         self.screen.blit(menu_surface, (200, 170))
         menu_black_surf = pygame.Surface((360, 82.5))
         menu_black_surf.fill(color.THECOLORS["black"])
-        font = pygame.font.SysFont('centurygothic', 45)
+        font = pygame.font.Font('dat/Century Gothic.ttf', 45)
         start_surface = font.render("New Game", True, color.THECOLORS["white"], color.THECOLORS["black"])
         (w, h) = pygame.font.Font.size(font, "New Game")
         self.screen.blit(menu_black_surf, (220, 190))
@@ -494,7 +496,7 @@ class Game:
     def score_screen(self):
         self._running = False
         self.screen.fill(color.THECOLORS["black"])
-        font = pygame.font.SysFont('centurygothic', 32)
+        font = pygame.font.Font('dat/Century Gothic.ttf', 32)
         for i in range(10):
             surface = font.render("{:d}".format(i + 1), True, color.THECOLORS["blue"])
             self.screen.blit(surface, ((WIDTH / 16), (HEIGHT / 12) * i + 16))
@@ -525,7 +527,7 @@ class Game:
         new_high_score = self.final_score > self._high_scores[9][0]
         while self._gameover:
             self.screen.fill(color.THECOLORS["black"])
-            font = pygame.font.SysFont('centurygothic', 60)
+            font = pygame.font.Font('dat/Century Gothic.ttf', 60)
             (w, h) = pygame.font.Font.size(font, "Game Over")
             title_surface = font.render("Game Over", True, color.THECOLORS["blue"])
             self.screen.blit(title_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 3))
@@ -536,7 +538,7 @@ class Game:
                 (w, h) = pygame.font.Font.size(font, "Enter your name: {:s}".format(name))
                 score_surface = font.render("Enter your name: {:s}".format(name), True, color.THECOLORS["blue"])
                 self.screen.blit(score_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 2 + 2 * h))
-            font = pygame.font.SysFont('centurygothic', 30)
+            font = pygame.font.Font('dat/Century Gothic.ttf', 30)
             (w, h) = pygame.font.Font.size(font, "  Back to menu  ")
             back_to_menu_surface = font.render("  Back to menu  ", True, color.THECOLORS["white"],
                                                color.THECOLORS["black"])
@@ -585,7 +587,7 @@ class Game:
                 self.obstacles_display()
                 self.scores_update()
                 if self.bonus_speed_time > 0:
-                    font = pygame.font.SysFont('centurygothic', 120)
+                    font = pygame.font.Font('dat/Century Gothic.ttf', 120)
                     (w, h) = pygame.font.Font.size(font, "BONUS!")
                     title_surface = font.render("BONUS!", True, color.THECOLORS["orange"])
                     self.screen.blit(title_surface, ((WIDTH - w) / 2, h / 3))
