@@ -300,6 +300,7 @@ class Game:
         if self.no_collision_time == 0:
             if obstacle_rect.colliderect(self.player.rect):
                 self._gameover = True
+                self._running = False
 
     def obstacles_handler(self, tick):
         if self.rectangle_obstacles:
@@ -445,6 +446,7 @@ class Game:
             self.speed = self.speed / 3
 
     def start_menu(self):
+        self._running = False
         self.screen.fill(color.THECOLORS["black"])
         font = pygame.font.SysFont('centurygothic', 80)
         (w, h) = pygame.font.Font.size(font, "Match Runner")
@@ -490,6 +492,7 @@ class Game:
                     quit()
 
     def score_screen(self):
+        self._running = False
         self.screen.fill(color.THECOLORS["black"])
         font = pygame.font.SysFont('centurygothic', 32)
         for i in range(10):
@@ -517,6 +520,7 @@ class Game:
                     self._start_window = True
 
     def gameover(self):
+        self._running = False
         name = ""
         new_high_score = self.final_score > self._high_scores[9][0]
         while self._gameover:
@@ -560,34 +564,35 @@ class Game:
                         name += event.unicode
 
     def execute(self):
-        while self._running:
+        while True:
             while self._start_window:
                 self.start_menu()
             while self._scores_window:
                 self.score_screen()
-            if self.speed < self.maxspeed:
-                self.speed += self.deltaspeed
-            self.bonus_speed_handler()
-            self.tick = self.clock.tick(60)
-            self.events_handler()
-            self.screen.fill(color.THECOLORS["black"])
-            for score in self.scores:
-                score.update(self.screen, self.tick, self.speed)
-            self.obstacles_handler(self.tick)
-            if not self._paused:
-                self.player.update(self.screen, self.tick / 1000.0, self.speed, self.no_collision)
-            self.match_updater(self.tick)
-            self.obstacles_display()
-            self.scores_update()
-            if self.bonus_speed_time > 0:
-                font = pygame.font.SysFont('centurygothic', 120)
-                (w, h) = pygame.font.Font.size(font, "BONUS!")
-                title_surface = font.render("BONUS!", True, color.THECOLORS["orange"])
-                self.screen.blit(title_surface, ((WIDTH - w) / 2, h / 3))
-            pygame.display.flip()
-            for score in self.scores:
-                if score.rect.left < self.player.rect.left:
-                    self.final_score = score.score
+            while self._running:
+                if self.speed < self.maxspeed:
+                    self.speed += self.deltaspeed
+                self.bonus_speed_handler()
+                self.tick = self.clock.tick(60)
+                self.events_handler()
+                self.screen.fill(color.THECOLORS["black"])
+                for score in self.scores:
+                    score.update(self.screen, self.tick, self.speed)
+                self.obstacles_handler(self.tick)
+                if not self._paused:
+                    self.player.update(self.screen, self.tick / 1000.0, self.speed, self.no_collision)
+                self.match_updater(self.tick)
+                self.obstacles_display()
+                self.scores_update()
+                if self.bonus_speed_time > 0:
+                    font = pygame.font.SysFont('centurygothic', 120)
+                    (w, h) = pygame.font.Font.size(font, "BONUS!")
+                    title_surface = font.render("BONUS!", True, color.THECOLORS["orange"])
+                    self.screen.blit(title_surface, ((WIDTH - w) / 2, h / 3))
+                pygame.display.flip()
+                for score in self.scores:
+                    if score.rect.left < self.player.rect.left:
+                        self.final_score = score.score
             while self._gameover:
                 self.gameover()
 
