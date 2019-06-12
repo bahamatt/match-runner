@@ -1,0 +1,13 @@
+Celem w tej grze jest jak przetrwanie
+jak najdluzej, przez omijanie przeszkod.
+Gdy pojawia sie pomaranczowy prostokat,
+mozna w niego wskoczyc rozpoczynajac gre match-3.
+W niej celem jest wykonanie jak najwiekszej
+liczby dopasowan plytek.
+Jesli uda sie ich zdobyc
+conajmniej 5 w ciagu 15 sekund
+wowczas przyznawany jest okres nietykalnosci.
+Sterowanie:
+Spacja - skok (mozna skakac dowolna liczbe razy
+dopoki obiekt nie zacznie spadac)
+Myszka - przesuwanie plytek
