@@ -48,24 +48,20 @@ def gameover_screen(self):
         self.screen.blit(back_to_menu_bg, (28, HEIGHT - h - 22))
         self.screen.blit(back_to_menu_surface, (30, HEIGHT - h - 20))
         pygame.display.update()
-        events_handler(self, new_high_score, name, h, w)
-
-
-def events_handler(self, new_high_score, name, h, w):
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-        elif event.type == MOUSEBUTTONDOWN:
-            mouse_rect = pygame.Rect(pygame.mouse.get_pos(), (3, 3))
-            if Rect(30, HEIGHT - h - 20, w + 4, h + 4).colliderect(mouse_rect):
-                self._gameover = False
-                self._start_window = True
-        elif event.type == KEYDOWN and new_high_score:
-            if event.key == K_RETURN:
-                add_high_score(self, self.final_score, name)
-                new_high_score = False
-            elif event.key == K_BACKSPACE:
-                name = name[:-1]
-            else:
-                name += event.unicode
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == MOUSEBUTTONDOWN:
+                mouse_rect = pygame.Rect(pygame.mouse.get_pos(), (3, 3))
+                if Rect(30, HEIGHT - h - 20, w + 4, h + 4).colliderect(mouse_rect):
+                    self._gameover = False
+                    self._start_window = True
+            elif event.type == KEYDOWN and new_high_score:
+                if event.key == K_RETURN:
+                    add_high_score(self, self.final_score, name)
+                    new_high_score = False
+                elif event.key == K_BACKSPACE:
+                    name = name[:-1]
+                else:
+                    name += event.unicode

@@ -10,8 +10,8 @@ from pygame.locals import color
 import match3 as match
 from gameover_screen import gameover_screen
 from help_screen import help_screen
-from scores import score_screen
 from menu_screen import menu_screen
+from scores import score_screen
 
 WIDTH = 800
 HEIGHT = 640
