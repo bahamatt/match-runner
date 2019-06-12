@@ -229,10 +229,7 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.scores = []
         self.scores_init()
-        self.rectangle_obstacles = []
-        self.stones = []
-        self.ground_stones = []
-        self.tunnels = []
+        self.obstacles = []
         self.match_rectangles = []
         self.deltaspeed = 0.01
         self.is_displaying_obstacles = False
@@ -254,10 +251,7 @@ class Game:
         self.player.rect = self.player.rect.move(self.player.x, self.player.y)
         self.scores = []
         self.scores_init()
-        self.rectangle_obstacles = []
-        self.stones = []
-        self.ground_stones = []
-        self.tunnels = []
+        self.obstacles = []
         self.match_rectangles = []
         self.is_displaying_obstacles = False
         self.tick = 0
@@ -297,14 +291,12 @@ class Game:
                 self._running = False
 
     def obstacles_handler(self, tick):
-        for obstacle_list in [self.rectangle_obstacles, self.stones, self.ground_stones, self.tunnels]:
-            if obstacle_list:
-                for obstacle in obstacle_list:
-                    obstacle.update(self.screen, tick, self.speed)
-                    self.check_for_collision(obstacle.rect)
-                    if obstacle_list == self.tunnels:
-                        self.check_for_collision(obstacle.lower_rect)
-                self.obstacles_update(obstacle_list)
+        for obstacle in self.obstacles:
+            obstacle.update(self.screen, tick, self.speed)
+            self.check_for_collision(obstacle.rect)
+            if isinstance(obstacle, Tunnel):
+                self.check_for_collision(obstacle.lower_rect)
+            self.obstacle_update(obstacle)
 
     def match_updater(self, tick):
         if self.match_rectangles:
@@ -337,11 +329,11 @@ class Game:
                 new_obstacle = RectangleObstacle(self.speed)
                 new_obstacle.rect = new_obstacle.rect.move(new_obstacle.x + i * 300,
                                                            4 / 5 * HEIGHT - new_obstacle.height)
-                self.rectangle_obstacles.append(new_obstacle)
+                self.obstacles.append(new_obstacle)
             else:
                 new_obstacle = RectangleObstacle(self.speed)
                 new_obstacle.rect = new_obstacle.rect.move(new_obstacle.x + i * 300, 0)
-                self.rectangle_obstacles.append(new_obstacle)
+                self.obstacles.append(new_obstacle)
         self.is_displaying_obstacles = True
 
     def tunnels_init(self):
@@ -350,32 +342,32 @@ class Game:
             new_tunnel.rect = new_tunnel.rect.move(new_tunnel.x + i * 375, 0)
             new_tunnel.lower_rect = new_tunnel.lower_rect.move(new_tunnel.x + i * 375,
                                                                4 / 5 * HEIGHT - new_tunnel.lower_length)
-            self.tunnels.append(new_tunnel)
+            self.obstacles.append(new_tunnel)
         self.is_displaying_obstacles = True
 
     def stones_init(self):
         for i in range(0, 5):
             new_stone = Stone(self.speed)
             new_stone.rect = new_stone.rect.move(new_stone.x + i * 250, new_stone.y)
-            self.stones.append(new_stone)
+            self.obstacles.append(new_stone)
         self.is_displaying_obstacles = True
 
     def ground_stone_init(self):
         new_circle = GroundStone(self.speed)
         new_circle.rect = new_circle.rect.move(new_circle.x, new_circle.y)
-        self.ground_stones.append(new_circle)
+        self.obstacles.append(new_circle)
         self.is_displaying_obstacles = True
 
-    def obstacles_update(self, obstacles):
-        if obstacles == self.ground_stones:
-            if obstacles[0].rect.x <= -50:
-                obstacles.remove(obstacles[0])
+    def obstacle_update(self, obstacle):
+        if isinstance(obstacle, GroundStone):
+            if obstacle.rect.x <= -50:
+                self.obstacles.pop(0)
                 self.is_displaying_obstacles = False
             return
-        if len(obstacles) == 1:
+        if len(self.obstacles) == 1:
             self.is_displaying_obstacles = False
-        if obstacles[-1].rect.x <= -50:
-            obstacles.remove(obstacles[0])
+        if self.obstacles[-1].rect.x <= -50:
+            self.obstacles.pop(0)
 
     def match_rectangle_init(self):
         new_match_rect = MatchRectangle(self.speed)
