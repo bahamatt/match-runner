@@ -24,6 +24,10 @@ def help_screen(self):
     self.screen.blit(back_to_menu_bg, (28, HEIGHT - h - 22))
     self.screen.blit(back_to_menu_surface, (30, HEIGHT - h - 20))
     pygame.display.update()
+    events_handler(self, h, w)
+
+
+def events_handler(self, h, w):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
