@@ -9,14 +9,14 @@ WIDTH = 800
 HEIGHT = 640
 
 
-def add_high_score(self, final_score, name):
+def add_high_score(self, final_score):
     i = 0
     while self._high_scores[i][0] >= final_score:
         i += 1
         if i > 10:
             print("error")
             break
-    self._high_scores.insert(i, (final_score, name))
+    self._high_scores.insert(i, (final_score, self.player_name))
     self._high_scores.pop()
     with open('scores.pickle', 'wb') as file:
         pickle.dump(self._high_scores, file)
@@ -24,8 +24,8 @@ def add_high_score(self, final_score, name):
 
 def gameover_screen(self):
     self._running = False
-    name = ""
-    new_high_score = self.final_score > self._high_scores[9][0]
+    self.player_name = ""
+    self.new_high_score = self.final_score > self._high_scores[9][0]
     while self._gameover:
         self.screen.fill(color.THECOLORS["black"])
         font = pygame.font.Font('dat/Century Gothic.ttf', 60)
@@ -35,9 +35,9 @@ def gameover_screen(self):
         (w, h) = pygame.font.Font.size(font, "Score: " + str(self.final_score))
         score_surface = font.render("Score: " + str(self.final_score), True, color.THECOLORS["blue"])
         self.screen.blit(score_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 2))
-        if new_high_score:
-            (w, h) = pygame.font.Font.size(font, "Enter your name: {:s}".format(name))
-            score_surface = font.render("Enter your name: {:s}".format(name), True, color.THECOLORS["blue"])
+        if self.new_high_score:
+            (w, h) = pygame.font.Font.size(font, "Enter your name: {:s}".format(self.player_name))
+            score_surface = font.render("Enter your name: {:s}".format(self.player_name), True, color.THECOLORS["blue"])
             self.screen.blit(score_surface, ((WIDTH - w) / 2, (HEIGHT - h) / 2 + 2 * h))
         font = pygame.font.Font('dat/Century Gothic.ttf', 30)
         (w, h) = pygame.font.Font.size(font, "  Back to menu  ")
@@ -57,11 +57,11 @@ def gameover_screen(self):
                 if Rect(30, HEIGHT - h - 20, w + 4, h + 4).colliderect(mouse_rect):
                     self._gameover = False
                     self._start_window = True
-            elif event.type == KEYDOWN and new_high_score:
+            elif event.type == KEYDOWN and self.new_high_score:
                 if event.key == K_RETURN:
-                    add_high_score(self, self.final_score, name)
-                    new_high_score = False
+                    add_high_score(self, self.final_score)
+                    self.new_high_score = False
                 elif event.key == K_BACKSPACE:
-                    name = name[:-1]
+                    self.player_name = self.player_name[:-1]
                 else:
-                    name += event.unicode
+                    self.player_name += event.unicode

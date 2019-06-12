@@ -212,6 +212,8 @@ class Game:
         self._running = True
         self._paused = False
         self._gameover = False
+        self.player_name = ""
+        self.new_high_score = False
         self.display_match = False
         self.start_bonus_speed = False
         self.no_collision = False
