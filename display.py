@@ -448,12 +448,3 @@ class Game:
                         self.final_score = score.score
             while self._gameover:
                 gameover_screen(self)
-
-
-def main():
-    run_game = Game()
-    run_game.execute()
-
-
-if __name__ == '__main__':
-    main()

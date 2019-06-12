@@ -2,9 +2,9 @@ Your aim is to survive the longest you can while avoiding
 obstacles created by game.
 When orange rectangle appears on screen, you can jump
 into it and begin to play match-3 game! If you manage
-to collect at least 5 matches within 15 seconds, you
-will get 4 seconds of extra speed (and being invisible
-for obstacles).
+to collect some matches within 15 seconds, you
+will get time of extra speed and being invisible
+for obstacles - the more matches, the longer bonus!
 
 Controls:
 Space - jump (possible multiple jumps while uprising)
