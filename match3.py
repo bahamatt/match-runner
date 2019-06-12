@@ -1,8 +1,8 @@
 import random
 
 import pygame
-from pygame.locals import color
 from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP
+from pygame.locals import color
 
 WIDTH = 800
 HEIGHT = 640
@@ -88,12 +88,12 @@ class Game:
             self.draw()
             pygame.display.flip()
             self.time_left -= tick
-            if self.score >= 500:
-                pygame.display.update()
-                # self.win_window()
-                self.wait_for(250)
-                self._running = False
-                return self.score
+            # if self.score >= 500:
+            #     pygame.display.update()
+            #     # self.win_window()
+            #     self.wait_for(250)
+            #     self._running = False
+            #     return self.score
             if self.time_left < 0:
                 self._running = False
                 return self.score

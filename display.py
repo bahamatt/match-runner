@@ -3,9 +3,10 @@ import pickle
 from random import randrange
 
 import pygame
-from pygame.locals import color
-from pygame.locals import Rect
 from pygame.locals import KEYDOWN, K_SPACE, MOUSEBUTTONDOWN, K_RETURN, K_BACKSPACE
+from pygame.locals import Rect
+from pygame.locals import color
+
 import match3 as match
 
 WIDTH = 800
@@ -388,9 +389,10 @@ class Game:
 
     def bonus_speed_handler(self):
         if self.start_bonus_speed and self.player.on_the_ground():
-            self.no_collision_time = 5500
-            self.bonus_speed_time = 4000
+            self.bonus_speed_time = self.bonus_score * 5
+            self.no_collision_time = self.bonus_speed_time + 1500
             self.speed = self.speed * 3
+            self.bonus_score = 0
             self.start_bonus_speed = False
         if self.bonus_speed_time > 0:
             self.bonus_speed_time -= self.tick
@@ -405,7 +407,6 @@ class Game:
         if self.bonus_score >= 500:
             self.start_bonus_speed = True
             self.no_collision = True
-            self.bonus_score = 0
         if self.speed > self.maxspeed and self.bonus_speed_time == 0:
             self.speed = self.speed / 3
 
