@@ -1,7 +1,8 @@
 import random
 
 import pygame
-from pygame.locals import *
+from pygame.locals import color
+from pygame.locals import MOUSEBUTTONDOWN, MOUSEBUTTONUP
 
 WIDTH = 800
 HEIGHT = 640
