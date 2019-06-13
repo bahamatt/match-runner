@@ -26,7 +26,7 @@ class PlayerObject:
         self.falling = False
         self.surface = pygame.Surface((20, 20))
         self.rect = Rect(self.surface.get_rect())
-        self.max_jump_height = 3 / 5 * HEIGHT
+        self.max_jump_height = 4 / 5 * HEIGHT - 150
 
     def on_the_ground(self):
         if self.y >= 4 / 5 * HEIGHT - 20:
