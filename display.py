@@ -399,7 +399,7 @@ class Game:
         if self.bonus_speed_time < 0:
             self.bonus_speed_time = 0
             self.speed = self.speed / 3
-        if self.no_collision_time < 0:
+        if self.no_collision_time <= 0:
             self.no_collision_time = 0
             self.no_collision = False
         if self.bonus_score >= 500:
