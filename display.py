@@ -55,7 +55,7 @@ class PlayerObject:
         if self.on_the_ground() and not self.jumping:
             self.dy = 0
             self.y = 4 / 5 * HEIGHT - 20
-            self.max_jump_height = 4 / 5 * HEIGHT - 150
+            self.max_jump_height = 3 / 5 * HEIGHT
             self.falling = False
 
         self.y += self.dy * tick
@@ -86,8 +86,7 @@ class ScoreObject:
 
 class RectangleObstacle:
     def __init__(self, game_speed):
-        self.max_height = HEIGHT / 2 - 100
-        self.height = self.max_height - randrange(10) * 15
+        self.height = HEIGHT / 2 - 100 - randrange(10) * 15
         self.x = WIDTH
         self.y = self.height
         self.speed = game_speed
